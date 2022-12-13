@@ -5,11 +5,13 @@
 
  # todo:
 - editor side software :x:
-    - different endings and awnsers :x:
+    - different endings and awnsers :x: - top priority
     - randomization :x:
     - UI :x:
         - image upload :x:
-        - text editor :x:
+        - text editor :x: - on progress
+        - show path to ending or history :x:
+    - full documentation :x:
 - user side software :x:
     - generic GUI :x:
     - custom GUI (via editor) :x:
