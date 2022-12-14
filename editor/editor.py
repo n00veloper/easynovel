@@ -1,14 +1,58 @@
 import tkinter as tk
 from tkinter import filedialog as fd
 from tkinter import messagebox as msg
-import random
-import time
+import tempfile as tmp
+import os
+import json
+import platform
 
 def removeHistory():
     pass
 
-def addHistory():
-    pass
+def addHistory(add, listbox):
+    """
+    add is a list of:
+    [0] comment
+    [1] prompt
+    [2] log
+    all on tkinter text object, needs to be extracted.
+    listbox is a listbox tkinter object
+    """
+    # get os for path
+    if platform.system() == "Windows":
+        path = f"{tmpfolder}\\futuresave.ezn"
+    else:
+        path = f"{tmpfolder}/futuresave.ezn"
+    
+    # if blank, ignores
+    if add[0].get("1.0",tk.END) == "" or add[1].get("1.0",tk.END) == "" or add[2].get("1.0",tk.END) == "":
+        return 1
+    
+    # load data to change, or ignores
+    if os.path.exists(path):
+        with open(path,"r", encoding="UTF-8") as file:
+            data = json.loads(file.readlines()[0])
+    else:
+        data = {}
+    # change data
+    data[add[2].get("1.0",tk.END)] = {"comment": add[0].get("1.0",tk.END), "prompt": add[1].get("1.0",tk.END)}
+    
+    # write at temp folder
+    with open(path,"w", encoding="UTF-8") as file:
+        file.write(json.dumps(data))
+    
+    # delete all recourses on history list
+    listbox.delete(0,tk.END)
+
+    # add stuff to listbox, but short out first
+    ordered = sorted(data.keys(), key = lambda x:float(x))
+    for order in ordered:
+        comment = data[order]["comment"][0:10]
+        prompt = data[order]["prompt"][0:10]
+        listbox.insert(tk.END,f"{order} - c:{comment} - a:{prompt}")
+    
+    return 0 # return success
+
 
 def loadHistory():
     # will ask to open a .ezn file (eazynovel)
@@ -107,14 +151,15 @@ def GUI():
     row_4.grid(column=0, row=3)
 
     # will remove/add history at 4th row
-    remove_button = tk.Button(master=row_4, text='remove', command= lambda: removeHistory())
+    remove_button = tk.Button(master=row_4, text='remove', command=lambda: removeHistory(log, listBoxHistory))
     remove_button.grid(column=0, row=0)
 
-    add_button = tk.Button(master=row_4, text='add', command= lambda: addHistory())
+    add_button = tk.Button(master=row_4, text='add', command=lambda: addHistory([comment, prompt, log], listBoxHistory))
     add_button.grid(column=1, row=0)
 
     master.mainloop()
     return 0
 
 if __name__ == "__main__":
+    tmpfolder = tmp.mkdtemp() #temporary folder, modified save data
     GUI()
