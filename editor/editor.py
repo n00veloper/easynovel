@@ -5,9 +5,43 @@ import tempfile as tmp
 import os
 import json
 import platform
+import shutil
 
-def removeHistory():
-    pass
+def removeHistory(remove, listbox):
+    """
+    remove is the tkinter object where points to what to be removed
+    listbox is the listbox itself
+    """
+    # get os for path
+    if platform.system() == "Windows":
+        path = f"{tmpfolder}\\futuresave.ezn"
+    else:
+        path = f"{tmpfolder}/futuresave.ezn"
+    
+    # load data to change, or ignores
+    if os.path.exists(path):
+        with open(path,"r", encoding="UTF-8") as file:
+            data = json.loads(file.readlines()[0])
+
+        # change data
+        data.pop(remove.get("1.0",tk.END), None)
+
+        # write at temp folder
+        with open(path,"w", encoding="UTF-8") as file:
+            file.write(json.dumps(data))
+        
+        # delete all recourses on history list
+        listbox.delete(0,tk.END)
+
+        # add stuff to listbox, but short out first
+        ordered = sorted(data.keys(), key = lambda x:float(x))
+        for order in ordered:
+            comment = data[order]["comment"][0:10]
+            prompt = data[order]["prompt"][0:10]
+            listbox.insert(tk.END,f"{order} - c:{comment} - a:{prompt}")
+        
+        return 0 # return success
+    return 1
 
 def addHistory(add, listbox):
     """
@@ -54,13 +88,38 @@ def addHistory(add, listbox):
     return 0 # return success
 
 
-def loadHistory():
+def loadHistory(listbox):
     # will ask to open a .ezn file (eazynovel)
     filetypes = (
         ('easynovel files', '*.ezn'),
         ('All files', '*.*')
     )
     selectedFile = fd.askopenfilename(title="load your file", initialdir="./", filetypes=filetypes)
+
+    # get os for path
+    if platform.system() == "Windows":
+        path = f"{tmpfolder}\\futuresave.ezn"
+    else:
+        path = f"{tmpfolder}/futuresave.ezn"
+
+    # check file...
+    if os.path.isfile(selectedFile):
+        # copy save to temp
+        shutil.copyfile(selectedFile, path)
+        
+        # read temp folder
+        with open(path,"r", encoding="UTF-8") as file:
+            data = json.loads(file.readlines()[0])
+        
+        # delete all recourses on history list
+        listbox.delete(0,tk.END)
+
+        # add stuff to listbox, but short out first
+        ordered = sorted(data.keys(), key = lambda x:float(x))
+        for order in ordered:
+            comment = data[order]["comment"][0:10]
+            prompt = data[order]["prompt"][0:10]
+            listbox.insert(tk.END,f"{order} - c:{comment} - a:{prompt}")
 
 def saveHistory():
     # will ask to save a .ezn file (eazynovel)
@@ -69,10 +128,39 @@ def saveHistory():
         ('All files', '*.*')
     )
     selectedFile = fd.asksaveasfilename(title="save your file", initialdir="./", filetypes=filetypes)
+    # get os for path
+    if platform.system() == "Windows":
+        path = f"{tmpfolder}\\futuresave.ezn"
+    else:
+        path = f"{tmpfolder}/futuresave.ezn"
+    
+    #if does not have extension
+    if not "." in selectedFile:
+        selectedFile += ".ezn"
 
-def newHistory():
-    # will make everything blank, to create a new history.
-    pass
+    # if file does not exists, but temp exists, copy to path
+    if not os.path.isfile(selectedFile) and os.path.isfile(path):
+        shutil.copyfile(path, selectedFile)
+
+    # if temp does not exists (user did not made changes), make lazyerror
+    elif not os.path.isfile(path):
+        msg.showerror(title="too lazy error code", message="create something first!!!")
+    
+    # if file exists, and temp too, overwrite
+    elif os.path.isfile(selectedFile) and os.path.isfile(path):
+        if msg.askyesno(title="continue?", message=f"overwrite '{selectedFile}'?"):
+            shutil.copyfile(path, selectedFile)
+    
+    return 0
+
+def newHistory(listbox):
+    global tmpfolder
+    tmpfolder = tmp.mkdtemp() # new temporary folder, modified save data
+    
+    # delete all recourses on history list
+    listbox.delete(0,tk.END)
+    
+    return 0
 
 def GUI():
     master = tk.Tk()
@@ -107,10 +195,10 @@ def GUI():
     row_1.grid(column=0, row=0)
 
     # save, load or new at 1st row
-    load_button = tk.Button(master=row_1, text='load', command= lambda: loadHistory())
+    load_button = tk.Button(master=row_1, text='load', command= lambda: loadHistory(listBoxHistory))
     load_button.grid(column=0, row=0)
 
-    new_button = tk.Button(master=row_1, text='new', command= lambda: newHistory())
+    new_button = tk.Button(master=row_1, text='new', command= lambda: newHistory(listBoxHistory))
     new_button.grid(column=1, row=0)
 
     new_button = tk.Button(master=row_1, text='save', command= lambda: saveHistory())
