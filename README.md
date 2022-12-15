@@ -16,12 +16,12 @@
     - different endings and awnsers :x: - top priority
     - randomization :x:
     - UI :x:
-        - image upload :x:
-        - text editor :x: - half way
+        - image upload :x: - needs user side for better view
+        - text editor :o: - better design?
         - show path to ending or history :o: - can be better
     - full documentation :x:
 - user side software :x:
-    - generic GUI :x:
+    - generic GUI :x: - on the oven...
     - custom GUI (via editor) :x:
 - steam thopies trigger (one day...) :x:
 
