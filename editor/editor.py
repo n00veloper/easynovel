@@ -33,8 +33,8 @@ def removeHistory(remove, listbox):
         # delete all recourses on history list
         listbox.delete(0,tk.END)
 
-        # add stuff to listbox, but short out first
-        ordered = sorted(data.keys(), key = lambda x:float(x))
+        # add stuff to listbox, but sort out first
+        ordered = sorted(data.keys())
         for order in ordered:
             comment = data[order]["comment"][0:10]
             prompt = data[order]["prompt"][0:10]
@@ -78,8 +78,8 @@ def addHistory(add, listbox):
     # delete all recourses on history list
     listbox.delete(0,tk.END)
 
-    # add stuff to listbox, but short out first
-    ordered = sorted(data.keys(), key = lambda x:float(x))
+    # add stuff to listbox, but sort out first
+    ordered = sorted(data.keys())
     for order in ordered:
         comment = data[order]["comment"][0:10]
         prompt = data[order]["prompt"][0:10]
@@ -114,8 +114,8 @@ def loadHistory(listbox):
         # delete all recourses on history list
         listbox.delete(0,tk.END)
 
-        # add stuff to listbox, but short out first
-        ordered = sorted(data.keys(), key = lambda x:float(x))
+        # add stuff to listbox, but sort out first
+        ordered = sorted(data.keys())
         for order in ordered:
             comment = data[order]["comment"][0:10]
             prompt = data[order]["prompt"][0:10]
