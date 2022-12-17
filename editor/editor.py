@@ -6,8 +6,32 @@ import os
 import json
 import platform
 import shutil
+import _thread
+import pygame
+
+def stagefy(savestage):
+    # get stage progress
+    savestage = savestage.replace("\n", "")
+    stage = savestage.split(".")
+    if len(stage) <= 1:
+        stage.append("1")
+    # stage so far: ["(X,y)1", "1"]
+        
+    # if has branches
+    if "(" in stage[0]:
+        spl = stage[0].split(")") # so far ["(x,y", "1"]
+        tmp_stage = spl[1] # stage result = "1"
+        spl = spl[0].replace("(", "") # so far "x,y"
+        needs = spl.split(",") # needs result = "["x", "y"]"
+    # if not
+    else:
+        tmp_stage = stage[0]
+        needs = []
+    del stage[0]
+    return needs, tmp_stage, stage # list, str, list = needs, comment, 
 
 def removeHistory(remove, listbox):
+    global data
     """
     remove is the tkinter object where points to what to be removed
     listbox is the listbox itself
@@ -44,6 +68,7 @@ def removeHistory(remove, listbox):
     return 1
 
 def addHistory(add, listbox):
+    global data
     """
     add is a list of:
     [0] comment
@@ -89,6 +114,7 @@ def addHistory(add, listbox):
 
 
 def loadHistory(listbox):
+    global data
     # will ask to open a .ezn file (eazynovel)
     filetypes = (
         ('easynovel files', '*.ezn'),
@@ -248,6 +274,127 @@ def GUI():
     master.mainloop()
     return 0
 
+def visualGUI():
+    global data
+    pygame.init()
+    screen = pygame.display.set_mode((400, 400), pygame.RESIZABLE)
+    clock = pygame.time.Clock()
+
+    camera = [0,0]
+    camera_speed = 2 # speed
+    camera_tick = 2 # sleep
+
+    def visualLoad():
+        returned = []
+        for d in data.keys():
+            #fonts from system
+            identifier = pygame.font.SysFont('Arial', 25)
+            comment = pygame.font.SysFont('Arial', 20)
+            awnser = pygame.font.SysFont('Arial', 15)
+
+            # render text
+            size = [identifier.size(d), comment.size(data[d]["comment"]), awnser.size(data[d]["prompt"])] 
+            identifier = identifier.render(d, True, (0,0,0))
+            comment = comment.render(data[d]["comment"], True, (0,0,0))
+            awnser = awnser.render(data[d]["prompt"], True, (0,0,0))
+            needs_e, stage_e, comment_e = stagefy(d)
+            pos = [int(stage_e), int(comment_e[0])+1, len(needs_e)]
+            # to return text
+            returned.append([identifier, comment, awnser, pos, size])
+        return returned
+
+    # update ui every... (open file)
+    update_history_ticks = 100
+    update_history = 100
+    visualdata = visualLoad()
+    while True:
+        # check if quit
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        # check if pressed, moves every X ticks
+        move_ticker = 0
+        keys=pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            if move_ticker == 0:
+                move_ticker = camera_tick
+                camera[0] -= camera_speed
+        if keys[pygame.K_RIGHT]:
+            if move_ticker == 0:   
+                move_ticker = camera_tick     
+                camera[0] += camera_speed
+        if keys[pygame.K_DOWN]:
+            if move_ticker == 0:
+                move_ticker = camera_tick
+                camera[1] += camera_speed
+        if keys[pygame.K_UP]:
+            if move_ticker == 0:   
+                move_ticker = camera_tick     
+                camera[1] -= camera_speed
+            
+        screen.fill((255, 255, 255))
+        
+        # placeholder
+        #screen.blit(dialogue, (40-camera[0],40-camera[1]))
+        #screen.blit(name, (40-camera[0],140-camera[1]))
+        #screen.blit(game_over, (40-camera[0],240-camera[1]))
+        
+        # reset ticks
+        if move_ticker > 0:
+            move_ticker -= 1
+        if update_history == 0:
+            visualdata = visualLoad()
+            update_history = update_history_ticks 
+        if update_history > 0:
+            update_history -= 1
+
+        # loop for data...
+        sz, szy = (0, 0)
+        inf = {}
+        oydt = 0
+        for dt in visualdata:
+            # dt = [identifier, comment, awnser, pos, size]
+            szy = 0
+            # if has same history path, get older size
+            if str(dt[3][0]) in inf:
+                szy = inf[str(dt[3][0])]
+                print(dt[3][0], szy)
+            if str(dt[3][0])+" "+str(dt[3][1]) in inf:
+                szy = inf[str(dt[3][0])+" "+str(dt[3][1])]
+
+            # do some math to show the text
+            screen.blit(dt[0], ((dt[3][0]*150)-camera[0],((dt[3][1]*oydt)/3)+szy-camera[1]))
+            szy += dt[4][0][1]
+            screen.blit(dt[1], ((dt[3][0]*150)-camera[0],((dt[3][1]*oydt)/3)+szy-camera[1]))
+            szy += dt[4][1][1]
+            screen.blit(dt[2], ((dt[3][0]*150)-camera[0],((dt[3][1]*oydt)/3)+szy-camera[1]))
+            szy += dt[4][2][1]
+            oydt = dt[4][1][1]+dt[4][2][1]+dt[4][0][1]
+
+            #save every id, and size used, for spacing
+            if str(dt[3][0]) in inf:
+                if inf[str(dt[3][0])] > szy:
+                    inf[str(dt[3][0])] = szy+oydt
+                else:
+                    inf[str(dt[3][0])] = szy+oydt
+            else:
+                inf[str(dt[3][0])] = szy+oydt
+            if str(dt[3][0])+" "+str(dt[3][1]) in inf:
+                if inf[str(dt[3][0])+" "+str(dt[3][1])] > szy:
+                    inf[str(dt[3][0])+" "+str(dt[3][1])] = szy+oydt
+                    print(szy)
+                else:
+                    inf[str(dt[3][0])+" "+str(dt[3][1])] = szy+oydt
+            else:
+                inf[str(dt[3][0])+" "+str(dt[3][1])] = szy+oydt
+
+
+        pygame.display.flip()
+        clock.tick(60)
+
 if __name__ == "__main__":
     tmpfolder = tmp.mkdtemp() #temporary folder, modified save data
+    data = {} # info of the history itself
+    _thread.start_new_thread(visualGUI, ())
     GUI()
