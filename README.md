@@ -18,9 +18,9 @@
     - UI :x:
         - image upload :x: - needs user side for better view
         - text editor :o: - better design?
-        - visual editor? :x: - yet only show save, on progress
+        - visual editor? :x: - yet only show save, on progress (near future update!)
         - show path to ending or history :o: - can be better
-    - full documentation :x:
+    - full documentation :x: - (next update)
 - user side software :x:
     - generic GUI :x: - needs to be able to reset save!
     - custom GUI (via editor) :x:
