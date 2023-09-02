@@ -1,3 +1,5 @@
+# used for global variables only!
+
 frame_at = []
 canvas = None
 root = None

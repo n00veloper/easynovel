@@ -3,12 +3,10 @@ import tkinter as tk
 
 def connector():
     i = 0
-    # temporary
+    # delete old arrows
     cache.canvas.delete("all")
-    #while i < len(cache.dic_el["movable"])-1:
-    #    cache.canvas.create_line(cache.dic_el["movable"][i].winfo_x(), cache.dic_el["movable"][i].winfo_y(), cache.dic_el["movable"][i+1].winfo_x(), cache.dic_el["movable"][i+1].winfo_y(), arrow=tk.LAST)
-    #    i += 1
 
+    # make shortest path for arrow by ID
     tmp_list = []
     for item in cache.dic_el["ID"]:
         v1 = item[0].get("1.0",'end-1c')
@@ -22,6 +20,7 @@ def connector():
 
     tmp_list.sort(key = lambda row: (row[1]))
 
+    # add arrows from tmp_list order.
     dic_keys = {}
     for equal in tmp_list:
         for item in tmp_list:

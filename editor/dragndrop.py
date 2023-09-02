@@ -3,10 +3,13 @@ import cache
 import canvas
 
 def make_all_draggable(widget):
+    # same as make_draggable, but for scrolling the whole screen
     widget.bind("<Button-2>", on_drag_start)
     widget.bind("<B2-Motion>", drag_all)
 
 def drag_all(event):
+    # drag everything to the opposite direction, like if the background was scrolled somewhere else.
+    # note the cache.sensibility, it can be changed for better or worst controll
     widget = event.widget
     x = (widget._drag_start_x - event.x) / cache.sensibility
     y = (widget._drag_start_y - event.y) / cache.sensibility
@@ -15,15 +18,18 @@ def drag_all(event):
     canvas.connector()
 
 def make_draggable(widget):
+    # get every drag event on track
     widget.bind("<Button-1>", on_drag_start)
     widget.bind("<B1-Motion>", on_drag_motion)
 
 def on_drag_start(event):
+    # on start of drag, get event position, so it goes smoother.
     widget = event.widget
     widget._drag_start_x = event.x
     widget._drag_start_y = event.y
 
 def on_drag_motion(event):
+    # do a drag and drop movment on a early on called event
     widget = event.widget
     x = widget.winfo_x() - widget._drag_start_x + event.x
     y = widget.winfo_y() - widget._drag_start_y + event.y
