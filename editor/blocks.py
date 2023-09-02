@@ -6,7 +6,7 @@ def show_menu(event, menu):
         global frame_at
         x = cache.root.winfo_x() + event.x
         y = cache.root.winfo_y() + event.y
-        frame_at = [event.x,event.y]
+        cache.frame_at = [event.x,event.y]
         menu.tk_popup(x, y)
 
 def frame_del(event, menu_del):
@@ -23,11 +23,9 @@ def delete_frame():
         del cache.dic_el["ID"][delete]
         cache.frame_right_click.place_forget()
 
-        print(cache.dic_el)
-
-def create_frame_at():
+def create_frame_at(comment_v = False, prompt_v = False, ID_prompt_v = False, OR_prompt_v = False):
         frame = DnDFrame(cache.root, bd=10, bg="grey")
-        frame.place(x=frame_at[0], y=frame_at[1], width=200, height=300)
+        frame.place(x=cache.frame_at[0], y=cache.frame_at[1], width=200, height=300)
 
         # full form for history
         i_label = tk.Label(master=frame, text = "comment")
@@ -50,8 +48,13 @@ def create_frame_at():
         OR_label.grid(column=0, row=3)
         OR_prompt.grid(column=1, row=3)
 
+        for val in [[comment_v, comment], [prompt_v, prompt], [ID_prompt_v, ID_prompt], [OR_prompt_v, OR_prompt]]:
+                if val[0]:
+                        val[1].delete(1.0, "end")
+                        val[1].insert("end", val[0])
+
         cache.dic_el["movable"].append(frame)
-        cache.dic_el["ID"].append([ID_prompt, OR_prompt, frame, comment, prompt])
+        cache.dic_el["ID"].append([ID_prompt, OR_prompt, frame, comment, prompt, "frame"])
         canvas.connector()
 
         frame.bind("<Button-3>", lambda event: frame_del(event, cache.menu_del))
