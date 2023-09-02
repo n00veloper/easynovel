@@ -1,7 +1,7 @@
 # easynovel
  a simple novel maker with txt and images
  
- it will make you a easy and executable visual novel :)
+ it will make you a easy and executable visual novel :smile:
 
  how it works:
  [documentation for editor](/doc/editor.md)
@@ -13,7 +13,7 @@
     - UI :x:
         - image upload :x:
         - text editor :x:
-        - visual editor :x: - edit only, on progress
+        - visual editor :o:
         - show path to ending or history :o:
     - full documentation :o: - up to date
 - user side software :x:
