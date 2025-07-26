@@ -11,10 +11,11 @@ def drag_all(event):
     # drag everything to the opposite direction, like if the background was scrolled somewhere else.
     # note the cache.sensibility, it can be changed for better or worst controll
     widget = event.widget
-    x = (widget._drag_start_x - event.x) / cache.sensibility
-    y = (widget._drag_start_y - event.y) / cache.sensibility
+    x = (widget._drag_start_x - event.x)
+    y = (widget._drag_start_y - event.y)
     for item in cache.dic_el["movable"]:
         item.place(x=item.winfo_x()-x, y=item.winfo_y()-y)
+    on_drag_start(event)
     canvas.connector()
 
 def make_draggable(widget):

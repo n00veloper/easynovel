@@ -10,5 +10,3 @@ dic_el = {
     "movable":[],
     "ID": []
     }
-sensibility = 50
-sensibility_default = 50
