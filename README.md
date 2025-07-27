@@ -8,7 +8,7 @@
 
  # todo:
 - editor side software :x:
-    - different endings and awnsers :x:
+    - different endings and awnsers (same block) :x:
     - randomization :x:
     - UI :x:
         - image upload :x:
