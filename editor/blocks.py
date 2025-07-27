@@ -2,21 +2,31 @@ import cache
 from dragndrop import *
 import tkinter as tk
 
+def str_to_int(value):
+        # function for reading text on blocks to int, good use in id order and id connection, fallback to -1 if not a number
+        value = value.strip()  # Remove spaces
+        try:
+                value = int(value)
+                return value
+        except:
+                return -1
+
+
 def show_menu(event, menu):
         # used to get the menu to show in the right position
         global frame_at
         x = cache.root.winfo_x() + event.x
         y = cache.root.winfo_y() + event.y
-        cache.frame_at = [event.x,event.y]
+        cache.frame_at = [event.x,event.y] # fix position of new block (if adding a new one)
         menu.tk_popup(x, y)
 
 def frame_del(event, menu_del):
         # show options to delete or condigure the frame.
         cache.frame_right_click = event.widget
-
         global frame_at
         x = cache.frame_right_click.winfo_rootx() + event.x
         y = cache.frame_right_click.winfo_rooty() + event.y
+        cache.frame_at = [event.x,event.y] # fix position of new block (if adding a new one)
         menu_del.tk_popup(x, y)
 
 def delete_frame():
@@ -26,6 +36,22 @@ def delete_frame():
         del cache.dic_el["movable"][delete]
         del cache.dic_el["ID"][delete]
         cache.frame_right_click.place_forget()
+
+def next_frame():
+        # add a new frame next to the context menu selected
+        index = cache.dic_el["movable"].index(cache.frame_right_click)
+        order = cache.dic_el["ID"][index][1].get("1.0",'end-1c')
+        connection = cache.dic_el["ID"][index][0].get("1.0",'end-1c')
+        
+        create_frame_at("","", str(str_to_int(connection)), str(str_to_int(order)+1))
+
+def next_breach_frame():
+        # add a new frame breach next to the context menu selected
+        index = cache.dic_el["movable"].index(cache.frame_right_click)
+        order = cache.dic_el["ID"][index][1].get("1.0",'end-1c')
+        connection = cache.dic_el["ID"][index][0].get("1.0",'end-1c')
+        
+        create_frame_at("","", str(str_to_int(connection)+1), str(str_to_int(order)))
 
 def create_frame_at(comment_v = False, prompt_v = False, ID_prompt_v = False, OR_prompt_v = False):
         #creates frames.

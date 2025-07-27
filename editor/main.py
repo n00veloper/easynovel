@@ -21,6 +21,10 @@ def main_window():
 
     # manu del is cached because it is used globally, but is set here, used for frame manipulation on right click (mouse-3)
     cache.menu_del = tix.Menu(cache.root)
+    cache.menu_del.add_command(label="add next frame", command=blocks.next_frame)
+    cache.menu_del.add_separator()
+    cache.menu_del.add_command(label="add next breach", command=blocks.next_breach_frame)
+    cache.menu_del.add_separator()
     cache.menu_del.add_command(label="Remove frame", command=blocks.delete_frame)
 
     # canvas is a fake "root window" so it does not open two menu on right click.
